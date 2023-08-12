@@ -104,77 +104,85 @@ def openai_call(
             break
 
 
+
+
 def main():
-
-    info_path = "information.txt"
-
-    with open(info_path, "r", encoding="utf-8") as file:
-        information = file.read()
 
     format_path = "format.txt"
 
     with open(format_path, "r", encoding="utf-8") as file:
         format = file.read()
 
-    example_path = "format.txt"
+    example_path = "example.txt"
 
     with open(example_path, "r", encoding="utf-8") as file:
-        example = file.read()    
+        example = file.read()   
 
-    
-    
-    system_prompt = """
-    You are an AI that generates data based on information. 
-    """
-    prompt = f"""
-    Create data of a specific structure based on the information I provide. 
+    info__dir_path = "/Users/kim-yeongsang/Desktop/instructino_ai/information/"
+    for i in range(0,66):
+        print("현재: {}".format(i))
+        info_path = info__dir_path + "information_{}.txt".format(i)
 
-    The information is as follows: 
-    `
-        {information}
-    `
+        with open(info_path, "r", encoding="utf-8") as file:
+            information = file.read()
 
-    The data structure is in the following JSON format. 
-    `   
-        {format}
-    `
+        system_prompt = """
+        You are an AI that generates data based on information. 
+        """
+        prompt = f"""
+        Create data of a specific structure based on the information I provide. 
 
-    Here are some examples of the data:
-    `
-        {example}
-    `
+        The information is as follows: 
+        `
+            {information}
+        `
 
-    You need to comply with the following requirements.
-    requirements:
-    1. The output should be an appropriate response to the instruction and the input. Make sure the output is less than 100 words.
-    2. The content of the generated data should not be duplicated.
-    3. All data (instruction, input, output) should be written in Korean.
-    4. Create 10 pieces of data and arrange them in a list format.
-    5. Please provide the answer without interruption and within the limited token range.
-    6. Not all instructions require input. For example, when a instruction asks about some general information, "what is the highest peak in the world", it is not necssary to provide a specific context. In this case, we simply put "" in the input field.
-    """
-    
-    response = openai_call(system_prompt, prompt, max_tokens=2000)
-    data = json.loads(response)
-    file_name_format = "data_{}.json"
+        The data structure is in the following JSON format. 
+        `   
+            {format}
+        `
 
-    file_number = 1
-    while True:
+        Here are some examples of the data:
+        `
+            {example}
+        `
+
+        You need to comply with the following requirements.
+        requirements:
+        1. The output should be an appropriate response to the instruction and the input. Make sure the output is less than 100 words.
+        2. The content of the generated data should not be duplicated.
+        3. All data (instruction, input, output) should be written in Korean.
+        4. Create 10 pieces of data and arrange them in a list format.
+        5. Please provide the answer without interruption and within the limited token range.
+        6. Not all instructions require input. For example, when a instruction asks about some general information, "what is the highest peak in the world", it is not necssary to provide a specific context. In this case, we simply put "" in the input field.
+        """
         try:
-            file_name = file_name_format.format(file_number)
-            file_path = os.path.join("./data", file_name)
-            if not os.path.exists(file_path):
-                with open(file_path, "w", encoding="utf-8") as json_file:
-                    json.dump(data, json_file, ensure_ascii=False, indent=4)
-                    print(f"The result save to {file_path}")
-                break
-            file_number += 1        
+            response = openai_call(system_prompt, prompt, max_tokens=2000)
+            # print(response)
+            data = json.loads(response)
         except:
-            print("failed save file")
+            print("범위를 넘었습니다")
+            continue
 
-    # with open("data.json", "a", encoding="utf-8") as json_file:
-    #     json.dump(data, json_file, ensure_ascii=False, indent=4)
-    #     json_file.write("\n")
+        file_name_format = "data_{}.json"
+
+        file_number = 1
+        while True:
+            try:
+                file_name = file_name_format.format(file_number)
+                file_path = os.path.join("./data", file_name)
+                if not os.path.exists(file_path):
+                    with open(file_path, "w", encoding="utf-8") as json_file:
+                        json.dump(data, json_file, ensure_ascii=False, indent=4)
+                        print(f"The result save to {file_path}")
+                    break
+                file_number += 1        
+            except:
+                print("failed save file {}".format(file_number))
+
+        # with open("data.json", "a", encoding="utf-8") as json_file:
+        #     json.dump(data, json_file, ensure_ascii=False, indent=4)
+        #     json_file.write("\n")
 
 if __name__ == "__main__":
     main()
